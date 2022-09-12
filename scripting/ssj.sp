@@ -76,8 +76,10 @@ public void OnAllPluginsLoaded() {
         hMsgStart = CreateConVar("ssj_msgstart", "{green}[SSJ] ", "SSJ messages prefix.");
         hMsgText  = CreateConVar("ssj_msgtext", "{lightblue}", "SSJ messages color.");
         hMsgVar   = CreateConVar("ssj_msgvar", "{darkred}", "SSJ variables color.");
-        AutoExecConfig(true, "chat_formats", "ssj");
     }
+
+    g_cvResetInStartZone = CreateConVar("ssj_reset_in_startzone", "1", "Should the ssj reset to first jump in the start zone?", _, true, 0.0, true, 1.0);
+    AutoExecConfig();
 
     hMsgStart.GetString(g_msg_start, sizeof(g_msg_start));
     ReplaceString(g_msg_start, sizeof(g_msg_start), "^", "\x07", false);
@@ -93,9 +95,6 @@ public void OnAllPluginsLoaded() {
 
 public void OnPluginStart() {
     RegConsoleCmd("sm_ssj", Command_SSJ, "SSJ");
-
-    g_cvResetInStartZone = CreateConVar("ssj_reset_in_startzone", "1", "Should the ssj reset to first jump in the start zone?", _, true, 0.0, true, 1.0);
-    AutoExecConfig(true, "convars", "ssj");
 
     g_hCookieEnabled      = RegClientCookie("ssj_enabled", "ssj_enabled", CookieAccess_Public);
     g_hCookieUsageMode    = RegClientCookie("ssj_displaymode", "ssj_displaymode", CookieAccess_Public);
@@ -383,7 +382,7 @@ public Action OnPlayerRunCmd(int client, int & buttons, int & impulse, float vel
         g_iTicksOnGround[client]++;
         if (buttons & IN_JUMP && g_iTicksOnGround[client] == 1) {
             if (g_bShavitTimerLoaded && g_cvResetInStartZone.BoolValue) {
-                if (Shavit_InsideZone(client, Zone_Start)) {
+                if (Shavit_InsideZone(client, Zone_Start, -1)) {
                     g_iJump[client]               = 0;
                     g_strafeTick[client]          = 0;
                     g_syncedTick[client]          = 0;
