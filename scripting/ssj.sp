@@ -68,32 +68,17 @@ float g_flTrajectory[MAXPLAYERS + 1];
 float g_vecTraveledDistance[MAXPLAYERS + 1][3];
 
 public void OnAllPluginsLoaded() {
-    hMsgStart = FindConVar("timer_msgstart");
-    hMsgText  = FindConVar("timer_msgtext");
-    hMsgVar   = FindConVar("timer_msgvar");
+    g_bShavitTimerLoaded = LibraryExists("shavit");
+}
 
-    if (hMsgStart == INVALID_HANDLE || hMsgText == INVALID_HANDLE || hMsgVar == INVALID_HANDLE) {
-        hMsgStart = CreateConVar("ssj_msgstart", "{green}[SSJ] ", "SSJ messages prefix.");
-        hMsgText  = CreateConVar("ssj_msgtext", "{lightblue}", "SSJ messages color.");
-        hMsgVar   = CreateConVar("ssj_msgvar", "{darkred}", "SSJ variables color.");
-    }
+public void OnPluginStart() {
+    hMsgStart = CreateConVar("ssj_msgstart", "{green}[SSJ] ", "SSJ messages prefix.");
+    hMsgText  = CreateConVar("ssj_msgtext", "{lightblue}", "SSJ messages color.");
+    hMsgVar   = CreateConVar("ssj_msgvar", "{darkred}", "SSJ variables color.");
 
     g_cvResetInStartZone = CreateConVar("ssj_reset_in_startzone", "1", "Should the ssj reset to first jump in the start zone?", _, true, 0.0, true, 1.0);
     AutoExecConfig();
 
-    hMsgStart.GetString(g_msg_start, sizeof(g_msg_start));
-    ReplaceString(g_msg_start, sizeof(g_msg_start), "^", "\x07", false);
-    hMsgText.GetString(g_msg_text, sizeof(g_msg_text));
-    ReplaceString(g_msg_text, sizeof(g_msg_text), "^", "\x07", false);
-    hMsgVar.GetString(g_msg_var, sizeof(g_msg_var));
-    ReplaceString(g_msg_var, sizeof(g_msg_var), "^", "\x07", false);
-
-    g_bShavitTimerLoaded = LibraryExists("shavit");
-
-    HookEvent("player_jump", OnPlayerJump);
-}
-
-public void OnPluginStart() {
     RegConsoleCmd("sm_ssj", Command_SSJ, "SSJ");
 
     g_hCookieEnabled      = RegClientCookie("ssj_enabled", "ssj_enabled", CookieAccess_Public);
@@ -112,6 +97,16 @@ public void OnPluginStart() {
             OnClientCookiesCached(i);
         }
     }
+}
+
+public void OnConfigsExecuted() {
+    hMsgStart.GetString(g_msg_start, sizeof(g_msg_start));
+    ReplaceString(g_msg_start, sizeof(g_msg_start), "^", "\x07", false);
+    hMsgText.GetString(g_msg_text, sizeof(g_msg_text));
+    ReplaceString(g_msg_text, sizeof(g_msg_text), "^", "\x07", false);
+    hMsgVar.GetString(g_msg_var, sizeof(g_msg_var));
+    ReplaceString(g_msg_var, sizeof(g_msg_var), "^", "\x07", false);
+    HookEvent("player_jump", OnPlayerJump);
 }
 
 public void OnLibraryRemoved(const char[] name) {
