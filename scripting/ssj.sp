@@ -185,19 +185,16 @@ public void OnClientPostAdminCheck(int client) {
 public Action onTouch(int client, int entity) {
     if (!(GetEntProp(entity, Prop_Data, "m_usSolidFlags") & 12))
         g_bTouchesWall[client] = true;
+    return Plugin_Continue;
 }
 
 public Action OnPlayerJump(Event event, char[] name, bool dontBroadcast) {
-
     int userid = GetEventInt(event, "userid");
 
     int client = GetClientOfUserId(userid);
 
-    if (IsFakeClient(client))
-        return;
-
-    if (g_iJump[client] && g_strafeTick[client] <= 0)
-        return;
+    if (IsFakeClient(client) || g_iJump[client] && g_strafeTick[client] <= 0)
+        return Plugin_Continue;
 
     g_iJump[client]++;
     float velocity[3];
@@ -225,6 +222,7 @@ public Action OnPlayerJump(Event event, char[] name, bool dontBroadcast) {
         g_flInitialSpeed[client]      = GetVectorLength(velocity);
         g_vecTraveledDistance[client] = NULL_VECTOR;
     }
+    return Plugin_Continue;
 }
 
 public Action Command_SSJ(int client, any args) {
@@ -319,6 +317,7 @@ public int SSJ_Select(Menu menu, MenuAction action, int client, int option) {
         ShowSSJMenu(client, GetMenuSelectionPosition());
     } else if (action == MenuAction_End)
         delete menu;
+    return 0;
 }
 
 void SSJ_GetStats(int client, float vel[3], float angles[3]) {
